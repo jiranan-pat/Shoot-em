@@ -9,7 +9,6 @@ SCREEN_TITLE = "Shoot 'Em"
 class ModelSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):
         self.model = kwargs.pop('model', None)
- 
         super().__init__(*args, **kwargs)
  
     def sync_with_model(self):
@@ -39,6 +38,16 @@ class BulletSprite(arcade.Sprite):
     def draw(self):
         self.bullet_sprite.set_position(self.model.x, self.model.y)
         self.bullet_sprite.draw()
+
+class AimSprite(arcade.Sprite):
+    def __init__(self, model):
+        self.model = model
+        self.aim_sprite = arcade.Sprite(
+            'images/rsz_aiming.png')
+
+    def draw(self):
+        self.aim_sprite.set_position(self.model.x, self.model.y)
+        self.aim_sprite.draw()
  
 class ShootEmWindow(arcade.Window):
     def __init__(self, width, height, title):
@@ -49,9 +58,11 @@ class ShootEmWindow(arcade.Window):
             "./images/background.png")
         self.world = World(SCREEN_WIDTH, SCREEN_HEIGHT)
 
+       
         self.gun_sprite = ModelSprite('images/shotgunv2.png', model=self.world.gun)
-        # self.bullet_sprite = ModelSprite('images/bulletYellow_outline.png', model=self.world.bullet)
-        self.aim_sprite = ModelSprite('images/rsz_aiming.png', model=self.world.aim)
+
+        self.aim_sprite = AimSprite(model=self.world.aim)
+        self.bullet_sprite = BulletSprite(model=self.world.bullet)
 
 
     def draw_background(self):
@@ -66,7 +77,7 @@ class ShootEmWindow(arcade.Window):
 
         self.draw_background()
         self.gun_sprite.draw()
-        # self.bullet_sprite.draw()
+        self.bullet_sprite.draw()
         self.aim_sprite.draw()
         output = f"Score: 0"
         arcade.draw_text(output, 15, 570, arcade.color.BLACK, 16)
