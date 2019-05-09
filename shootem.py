@@ -1,14 +1,17 @@
 import arcade
+import math
 from models import World
  
 SCREEN_WIDTH = 960
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Shoot 'Em"
+BULLET_SPEED = 5
 
 
 class ModelSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):
         self.model = kwargs.pop('model', None)
+
         super().__init__(*args, **kwargs)
  
     def sync_with_model(self):
@@ -28,16 +31,6 @@ class TargetSprite(arcade.Sprite):
     def draw(self):
         self.target_sprite.set_position(self.model.x, self.model.y)
         self.target_sprite.draw()
-
-class BulletSprite(arcade.Sprite):
-    def __init__(self, model):
-        self.model = model
-        self.bullet_sprite = arcade.Sprite(
-            'images/bulletYellow_outline.png')
-
-    def draw(self):
-        self.bullet_sprite.set_position(self.model.x, self.model.y)
-        self.bullet_sprite.draw()
 
 class AimSprite(arcade.Sprite):
     def __init__(self, model):
@@ -62,16 +55,13 @@ class ShootEmWindow(arcade.Window):
         self.gun_sprite = ModelSprite('images/shotgunv2.png', model=self.world.gun)
 
         self.aim_sprite = AimSprite(model=self.world.aim)
-        self.bullet_sprite = BulletSprite(model=self.world.bullet)
+        self.bullet_sprite = arcade.SpriteList()
 
 
     def draw_background(self):
         arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
                                       SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
-    
-    def update(self, delta):
-        self.world.update(delta)
- 
+
     def on_draw(self):
         arcade.start_render()
 
@@ -84,12 +74,36 @@ class ShootEmWindow(arcade.Window):
 
     
     def on_mouse_press(self, x, y, button, modifiers):
-        self.world.on_mouse_press(x, y, button, modifiers)
+        bullet = arcade.Sprite("images/bulletYellow_outline.png")
+
+        start_x = self.world.gun.x - 10
+        start_y = self.world.gun.y + 80
+        bullet.center_x = start_x
+        bullet.center_y = start_y
+
+        destination_x = x
+        destination_y = y
+
+        x_difference = destination_x - start_x
+        y_difference = destination_y - start_y
+        angle = math.atan2(y_difference, x_difference)
+
+        bullet.angle = math.degrees(angle)
+        print(f"Bullet angle: {bullet.angle:.2f}")
+
+        bullet.change_x = math.cos(angle) * BULLET_SPEED
+        bullet.change_y = math.sin(angle) * BULLET_SPEED
+
+        self.bullet_sprite.append(bullet)
+
     
     def on_mouse_motion(self, x, y, dx, dy):
         self.world.on_mouse_motion(x, y, dx, dy)
  
- 
+    def update(self, delta):
+        self.world.update(delta)
+        self.bullet_sprite.update()
+
 def main():
     window = ShootEmWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     arcade.set_window(window)
