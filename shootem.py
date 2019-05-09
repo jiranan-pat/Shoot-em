@@ -5,9 +5,9 @@ import os
 
 SPRITE_SCALING = 0.5
 SPRITE_TARGET_SCALING = 0.3
-TARGET_COUNT = 100
+TARGET_COUNT = 150
 TARGET_SPEED = 5
-BULLET_SPEED = 1
+BULLET_SPEED = 2.5
 
 SCREEN_WIDTH = 960
 SCREEN_HEIGHT = 600
@@ -136,7 +136,7 @@ class ShootEm(arcade.Window):
         bullet = arcade.Sprite("images/bulletYellow_outline.png")
 
         start_x = self.gun_sprite.center_x - 10
-        start_y = self.gun_sprite.center_y + 80
+        start_y = self.gun_sprite.center_y + 90
         bullet.center_x = start_x
         bullet.center_y = start_y
 
